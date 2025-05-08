@@ -1,13 +1,18 @@
-@media (max-width: 1024px) {
-    #video-container iframe {
-        width: 90%;
-        height: 60vh;
-    }
+#video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex; /* 利用flexbox居中视频 */
+    justify-content: center;
+    align-items: center;
+    background-color: #000; /* 黑边背景色 */
 }
 
-@media (max-width: 768px) {
-    #video-container iframe {
-        width: 95%;
-        height: 50vh;
-    }
+#video-container iframe {
+    max-width: 95%; /* 最大宽度防止超出屏幕 */
+    max-height: 95%; /* 最大高度防止超出屏幕 */
+    object-fit: contain; /* 核心：保持比例，黑边填充 */
+    border: none; /* 移除默认边框 */
 }

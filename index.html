@@ -1,49 +1,142 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>91官方网站</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* 给视频容器设置固定高度和宽度，你可以根据需要调整 */
+        /* 视频容器优化 */
+        #video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* 确保内容撑满视口 */
+            width: 100%;
+        }
+
         #video-container iframe {
-            width: 80%;
-            height: 600px;
+            /* 视频尺寸优化，使用相对单位实现响应式 */
+            max-width: 90%; /* 最大宽度占屏幕90% */
+            width: 800px; /* 基础宽度 */
+            height: calc(90vh - 40px); /* 高度占视口90%并留边距 */
+            border-radius: 12px; /* 增加圆角美观度 */
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); /* 增强立体感 */
+        }
+
+        /* 年龄验证弹窗优化 */
+        #age-verification-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+            animation: fadeIn 0.4s ease-out; /* 优化动画时长 */
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* 按钮样式统一 */
+        .modal-btn {
+            margin: 0 15px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        #yes-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #no-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #yes-btn:hover, #no-btn:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
-
 <body>
+    <!-- 年龄验证弹窗 -->
     <div id="age-verification-modal">
         <div class="modal-content">
-            <p>您是否已满18岁？</p>
-            <button id="yes-btn">是</button>
-            <button id="no-btn">否</button>
+            <p style="font-size: 1.2rem; margin-bottom: 25px;">
+                为了确保内容适合成年用户，<br>
+                请确认您已年满18周岁
+            </p>
+            <button id="yes-btn" class="modal-btn">我已满18岁</button>
+            <button id="no-btn" class="modal-btn">我未满18岁</button>
         </div>
     </div>
+
+    <!-- 视频容器 -->
     <div id="video-container" style="display: none;">
-        <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=80433022&bvid=BV1GJ411x7h7&cid=137649199&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+        <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=80433022&bvid=BV1GJ411x7h7&cid=137649199&p=1" 
+                scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true">
+        </iframe>
     </div>
+
     <script>
-        // 获取按钮元素
-        const yesBtn = document.getElementById('yes-btn');
-        const noBtn = document.getElementById('no-btn');
-        const videoContainer = document.getElementById('video-container');
-        const ageVerificationModal = document.getElementById('age-verification-modal');
+        // DOM加载后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 缓存DOM元素（使用更语义化的变量名）
+            const modal = document.getElementById('age-verification-modal');
+            const confirmBtn = document.getElementById('yes-btn');
+            const rejectBtn = document.getElementById('no-btn');
+            const videoWrapper = document.getElementById('video-container');
 
-        // 点击“是”按钮，隐藏年龄验证弹窗，显示视频容器
-        yesBtn.addEventListener('click', () => {
-            ageVerificationModal.style.display = 'none';
-            videoContainer.style.display = 'flex';
-        });
+            // 统一事件处理函数格式
+            const handleConfirm = () => {
+                modal.style.display = 'none';
+                videoWrapper.style.display = 'flex';
+                // 可选：添加Cookie记录年龄验证状态
+                // document.cookie = 'age_verified=true; max-age=2592000; path=/';
+            };
 
-        // 点击“否”按钮，可以添加一些逻辑，比如退出页面等，这里简单地隐藏弹窗
-        noBtn.addEventListener('click', () => {
-            ageVerificationModal.style.display = 'none';
+            const handleReject = () => {
+                // 增强用户反馈
+                alert('根据法律法规，未满18岁用户禁止访问此内容');
+                // 安全退出处理（不同浏览器兼容性处理）
+                if (typeof window.close === 'function' && !window.closed) {
+                    window.close();
+                } else {
+                    window.location.href = 'https://example.com/age-restricted';
+                }
+            };
+
+            // 事件监听优化（使用命名函数提高可读性）
+            confirmBtn.addEventListener('click', handleConfirm);
+            rejectBtn.addEventListener('click', handleReject);
+
+            // 键盘交互支持（ESC关闭弹窗）
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display !== 'none') {
+                    handleReject();
+                }
+            });
         });
     </script>
 </body>
-
 </html>

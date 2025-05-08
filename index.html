@@ -1,116 +1,49 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>91官方网站</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* 省略重复CSS（与整合版一致，此处聚焦JS优化） */
-        /* 新增CSS变量提升维护性 */
-        :root {
-            --safe-top: env(safe-area-inset-top, 44px);
-            --safe-bottom: env(safe-area-inset-bottom, 34px);
-        }
-
-        #video-container {
-            padding-top: var(--safe-top);
-            padding-bottom: var(--safe-bottom);
+        /* 给视频容器设置固定高度和宽度，你可以根据需要调整 */
+        #video-container iframe {
+            width: 80%;
+            height: 600px;
         }
     </style>
 </head>
+
 <body>
-    <!-- 页面结构不变 -->
+    <div id="age-verification-modal">
+        <div class="modal-content">
+            <p>您是否已满18岁？</p>
+            <button id="yes-btn">是</button>
+            <button id="no-btn">否</button>
+        </div>
+    </div>
+    <div id="video-container" style="display: none;">
+        <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=80433022&bvid=BV1GJ411x7h7&cid=137649199&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+    </div>
     <script>
-        // ------------------------ 常量与缓存 ------------------------
-        const SELECTORS = {
-            YES_BTN: '#yes-btn',
-            NO_BTN: '#no-btn',
-            VIDEO_CONTAINER: '#video-container',
-            AGE_MODAL: '#age-verification-modal',
-            VIDEO_IFRAME: '.video-iframe'
-        };
+        // 获取按钮元素
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const videoContainer = document.getElementById('video-container');
+        const ageVerificationModal = document.getElementById('age-verification-modal');
 
-        const ELEMENTS = {
-            yesBtn: document.querySelector(SELECTORS.YES_BTN),
-            noBtn: document.querySelector(SELECTORS.NO_BTN),
-            videoContainer: document.querySelector(SELECTORS.VIDEO_CONTAINER),
-            ageModal: document.querySelector(SELECTORS.AGE_MODAL),
-            videoIframe: document.querySelector(SELECTORS.VIDEO_IFRAME)
-        };
+        // 点击“是”按钮，隐藏年龄验证弹窗，显示视频容器
+        yesBtn.addEventListener('click', () => {
+            ageVerificationModal.style.display = 'none';
+            videoContainer.style.display = 'flex';
+        });
 
-        let device = { isMobile: false, isTablet: false }; // 设备状态缓存
-
-        // ------------------------ 高效UA检测（减少正则匹配） ------------------------
-        function detectDeviceType() {
-            const ua = navigator.userAgent.toLowerCase();
-            const isMobileUA = /Mobile|Android|iOS|iPod|iPhone/.test(ua);
-            const isTabletUA = /Tablet|iPad/.test(ua);
-            const isSmallScreen = window.innerWidth <= 768;
-
-            // 结合UA和屏幕尺寸判断（更精准）
-            device.isMobile = isMobileUA && !isTabletUA && isSmallScreen;
-            device.isTablet = (isTabletUA || (isMobileUA && !isSmallScreen));
-            
-            document.body.className = device.isMobile ? 'mobile' : device.isTablet ? 'tablet' : 'pc';
-        }
-
-        // ------------------------ 布局更新（合并逻辑 + 防抖） ------------------------
-        let layoutUpdateTimeout;
-        function debounceLayoutUpdate() {
-            clearTimeout(layoutUpdateTimeout);
-            layoutUpdateTimeout = setTimeout(updateLayout, 100); // 防抖100ms
-        }
-
-        function updateLayout() {
-            const isPortrait = window.innerHeight > window.innerWidth;
-            
-            // 视频比例切换（减少DOM操作）
-            ELEMENTS.videoIframe.style.aspectRatio = isPortrait ? '9/16' : '16/9';
-            
-            // 移动端安全区域增强（仅在手机生效）
-            if (device.isMobile) {
-                ELEMENTS.videoContainer.style.paddingTop = `calc(var(--safe-top) + ${isPortrait ? '16px' : '0'}`;
-            } else {
-                ELEMENTS.videoContainer.style.paddingTop = 'var(--safe-top)';
-            }
-        }
-
-        // ------------------------ 事件监听（合并同类事件） ------------------------
-        function initEventListeners() {
-            // 窗口变化事件合并（resize + orientationchange）
-            ['resize', 'orientationchange'].forEach(event => {
-                window.addEventListener(event, debounceLayoutUpdate);
-            });
-
-            // 按钮事件（仅一次DOM查询）
-            ELEMENTS.yesBtn.addEventListener('click', () => {
-                ELEMENTS.ageModal.style.display = 'none';
-                ELEMENTS.videoContainer.style.display = 'flex';
-                detectDeviceType(); // 显示时重新检测设备（应对跨设备跳转）
-                debounceLayoutUpdate(); // 触发布局更新
-            });
-
-            ELEMENTS.noBtn.addEventListener('click', () => {
-                window.location.href = 'https://example.com/age-restricted';
-            });
-        }
-
-        // ------------------------ 初始化（减少函数调用栈） ------------------------
-        function init() {
-            detectDeviceType();
-            initEventListeners();
-            updateLayout(); // 初始布局
-        }
-
-        // ------------------------ 立即执行（避免全局污染） ------------------------
-        (function() {
-            // 优先级：先隐藏弹窗再加载（避免闪现）
-            ELEMENTS.ageModal.style.display = 'flex';
-            ELEMENTS.videoContainer.style.display = 'none';
-            
-            // 使用requestAnimationFrame优化首次渲染
-            requestAnimationFrame(init);
-        })();
+        // 点击“否”按钮，可以添加一些逻辑，比如退出页面等，这里简单地隐藏弹窗
+        noBtn.addEventListener('click', () => {
+            ageVerificationModal.style.display = 'none';
+        });
     </script>
 </body>
+
 </html>

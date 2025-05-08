@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>91官方网站</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 给视频容器设置固定高度和宽度，你可以根据需要调整 */
+        #video-container iframe {
+            width: 80%;
+            height: 600px;
+        }
+    </style>
 </head>
+
 <body>
     <div id="age-verification-modal">
         <div class="modal-content">
@@ -17,6 +26,24 @@
     <div id="video-container" style="display: none;">
         <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=80433022&bvid=BV1GJ411x7h7&cid=137649199&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
     </div>
-    <script src="script.js"></script>
+    <script>
+        // 获取按钮元素
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        const videoContainer = document.getElementById('video-container');
+        const ageVerificationModal = document.getElementById('age-verification-modal');
+
+        // 点击“是”按钮，隐藏年龄验证弹窗，显示视频容器
+        yesBtn.addEventListener('click', () => {
+            ageVerificationModal.style.display = 'none';
+            videoContainer.style.display = 'flex';
+        });
+
+        // 点击“否”按钮，可以添加一些逻辑，比如退出页面等，这里简单地隐藏弹窗
+        noBtn.addEventListener('click', () => {
+            ageVerificationModal.style.display = 'none';
+        });
+    </script>
 </body>
+
 </html>
